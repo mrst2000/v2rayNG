@@ -99,9 +99,9 @@ object AppConfig {
     const val GeoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
     const val TgChannelUrl = "https://t.me/github_2dust"
 
-    const val DNS_PROXY = "1.1.1.1"
+    const val DNS_PROXY = "8.8.8.8"
     const val DNS_DIRECT = "223.5.5.5"
-    const val DNS_VPN = "1.1.1.1"
+    const val DNS_VPN = "8.8.8.8"
 
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"

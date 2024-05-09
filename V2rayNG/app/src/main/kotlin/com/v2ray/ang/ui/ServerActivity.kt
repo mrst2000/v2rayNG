@@ -507,12 +507,15 @@ class ServerActivity : BaseActivity() {
                 mode = transportTypes(networks[network])[type],
                 serviceName = path,
                 authority = requestHost,
+                f_length = "",
+                f_interval = "",
+                f_packet =  ""
         )
         if (sniField.isNotBlank()) {
             sni = sniField
         }
         val allowInsecure = if (allowinsecures[allowInsecureField].isBlank()) {
-            settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: false
+            settingsStorage?.decodeBool(PREF_ALLOW_INSECURE) ?: true
         } else {
             allowinsecures[allowInsecureField].toBoolean()
         }

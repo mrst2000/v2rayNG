@@ -134,6 +134,9 @@ data class V2rayConfig(
         }
 
         data class StreamSettingsBean(var network: String = DEFAULT_NETWORK,
+                                      var interval: String = "",
+                                      var length: String = "",
+                                      var packet: String = "",
                                       var security: String = "",
                                       var tcpSettings: TcpSettingsBean? = null,
                                       var kcpSettings: KcpSettingsBean? = null,
@@ -234,8 +237,11 @@ data class V2rayConfig(
 
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
                                           quicSecurity: String?, key: String?, mode: String?, serviceName: String?,
-                                          authority: String?): String {
+                                          authority: String?, f_length: String, f_interval: String, f_packet: String): String {
                 var sni = ""
+                length = f_length
+                interval = f_interval
+                packet = f_packet
                 network = transport
                 when (network) {
                     "tcp" -> {

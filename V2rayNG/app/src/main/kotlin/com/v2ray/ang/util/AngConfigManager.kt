@@ -226,8 +226,9 @@ object AngConfigManager {
                 return 0
             }
 
+            settingsStorage?.encode(AppConfig.PREF_ROUTING_MODE, 0)
             var config: ServerConfig? = null
-            val allowInsecure = settingsStorage?.decodeBool(AppConfig.PREF_ALLOW_INSECURE) ?: false
+            val allowInsecure = true
             if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
                 config = ServerConfig.create(EConfigType.VMESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
@@ -263,6 +264,13 @@ object AngConfigManager {
                                 if (TextUtils.isEmpty(vmessQRCode.scy)) DEFAULT_SECURITY else vmessQRCode.scy
                             vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
                         }
+
+                        val vmuxAsBoolean = vmessQRCode?.mux.toBoolean()
+                        settingsStorage?.encode(AppConfig.PREF_MUX_ENABLED, vmuxAsBoolean)
+
+                        val frag = if (vmessQRCode.fragment.isNullOrEmpty()) "41,5,nofrag" else vmessQRCode.fragment
+                        val fragpart = frag.split(",")
+
                         val sni = streamSetting.populateTransportSettings(
                             vmessQRCode.net,
                             vmessQRCode.type,
@@ -273,7 +281,10 @@ object AngConfigManager {
                             vmessQRCode.path,
                             vmessQRCode.type,
                             vmessQRCode.path,
-                            vmessQRCode.host
+                            vmessQRCode.host,
+                            fragpart[0],
+                            fragpart[1],
+                            fragpart[2]
                         )
 
                         val fingerprint = vmessQRCode.fp ?: streamSetting.tlsSettings?.fingerprint
@@ -372,6 +383,8 @@ object AngConfigManager {
                     val queryParam = uri.rawQuery.split("&")
                         .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
 
+                    val trojanfrag = if (queryParam["fragment"].isNullOrEmpty()) "41,5,nofrag" else queryParam["fragment"]
+                    val trojanfragpart = trojanfrag?.split(",")
                     val sni = config.outboundBean?.streamSettings?.populateTransportSettings(
                         queryParam["type"] ?: "tcp",
                         queryParam["headerType"],
@@ -382,7 +395,10 @@ object AngConfigManager {
                         queryParam["key"],
                         queryParam["mode"],
                         queryParam["serviceName"],
-                        queryParam["authority"]
+                        queryParam["authority"],
+                        trojanfragpart?.get(0) ?: "",
+                        trojanfragpart?.get(1) ?: "",
+                        trojanfragpart?.get(2) ?: ""
                     )
                     fingerprint = queryParam["fp"] ?: ""
                     config.outboundBean?.streamSettings?.populateTlsSettings(
@@ -411,6 +427,9 @@ object AngConfigManager {
                 config = ServerConfig.create(EConfigType.VLESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
 
+                val vlessfrag = if (queryParam["fragment"].isNullOrEmpty()) "41,5,nofrag" else queryParam["fragment"]
+
+                val vlessfragpart = vlessfrag?.split(",")
                 config.remarks = Utils.urlDecode(uri.fragment ?: "")
                 config.outboundBean?.settings?.vnext?.get(0)?.let { vnext ->
                     vnext.address = uri.idnHost
@@ -430,7 +449,10 @@ object AngConfigManager {
                     queryParam["key"],
                     queryParam["mode"],
                     queryParam["serviceName"],
-                    queryParam["authority"]
+                    queryParam["authority"],
+                    vlessfragpart?.get(0) ?: "" ,
+                    vlessfragpart?.get(1) ?: "" ,
+                    vlessfragpart?.get(2) ?: "nofrag"
                 )
                 streamSetting.populateTlsSettings(
                     queryParam["security"] ?: "",
@@ -513,6 +535,8 @@ object AngConfigManager {
                 vnext.users[0].alterId = alterId.toInt()
             }
             var fingerprint = streamSetting.tlsSettings?.fingerprint
+            val shadowfrag = queryParam["fragment"]
+            val shadowpart = shadowfrag?.split(",")
             val sni = streamSetting.populateTransportSettings(protocol,
                 queryParam["type"],
                 queryParam["host"]?.split("|")?.get(0) ?: "",
@@ -522,7 +546,11 @@ object AngConfigManager {
                 queryParam["key"],
                 queryParam["mode"],
                 queryParam["serviceName"],
-                queryParam["authority"])
+                queryParam["authority"],
+                shadowpart?.get(0) ?: "",
+                shadowpart?.get(1) ?: "",
+                shadowpart?.get(2) ?: ""
+            )
             streamSetting.populateTlsSettings(
                 if (tls) TLS else "", allowInsecure, sni, fingerprint, null,
                 null, null, null
@@ -612,7 +640,10 @@ object AngConfigManager {
                         null,
                         null,
                         null,
-                        null
+                        null,
+                        "",
+                        "",
+                        ""
                     )
                 } else if (queryPairs["plugin"] == "v2ray-plugin") {
                     var network = "ws";
@@ -629,7 +660,10 @@ object AngConfigManager {
                         null,
                         null,
                         null,
-                        null
+                        null,
+                        "",
+                        "",
+                        ""
                     )
                 }
                 if ("tls" in queryPairs) {

@@ -430,7 +430,7 @@ object V2rayConfigUtil {
                 ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
             val isCnRoutingMode =
                 (routingMode == ERoutingMode.BYPASS_MAINLAND.value || routingMode == ERoutingMode.BYPASS_LAN_MAINLAND.value)
-            val geoipCn = arrayListOf("geoip:cn")
+            val geoipCn = arrayListOf("geoip:ir")
 
             if (directDomain.size > 0) {
                 servers.add(
@@ -576,11 +576,14 @@ object V2rayConfigUtil {
             if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == false) {
                 return true
             }
-            if (v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.TLS
-                && v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.REALITY
-            ) {
+            if (v2rayConfig.outbounds[0].streamSettings?.packet == "nofrag") {
                 return true
             }
+//            if (v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.TLS
+//                && v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.REALITY
+//            ) {
+//                return true
+//            }
 
             val fragmentOutbound =
                 V2rayConfig.OutboundBean(
@@ -589,24 +592,27 @@ object V2rayConfigUtil {
                     mux = null
                 )
 
-            var packets = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
-            if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.REALITY
-                && packets == "tlshello"
-            ) {
-                packets = "1-3"
-            } else if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.TLS
-                && packets != "tlshello"
-            ) {
-                packets = "tlshello"
-            }
+//            var packets = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
+//            if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.REALITY
+//                && packets == "tlshello"
+//            ) {
+//                packets = "1-3"
+//            } else if (v2rayConfig.outbounds[0].streamSettings?.security == V2rayConfig.TLS
+//                && packets != "tlshello"
+//            ) {
+//                packets = "tlshello"
+//            }
+
 
             fragmentOutbound.settings = V2rayConfig.OutboundBean.OutSettingsBean(
                 fragment = V2rayConfig.OutboundBean.OutSettingsBean.FragmentBean(
-                    packets = packets,
-                    length = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_LENGTH)
-                        ?: "50-100",
-                    interval = settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL)
-                        ?: "10-20"
+                    packets = v2rayConfig.outbounds[0].streamSettings?.packet,
+                    length = v2rayConfig.outbounds[0].streamSettings?.length,
+//                    settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_LENGTH)
+//                        ?: "50-100",
+                    interval = v2rayConfig.outbounds[0].streamSettings?.interval,
+//                    settingsStorage?.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL)
+//                        ?: "10-20"
                 )
             )
             fragmentOutbound.streamSettings = V2rayConfig.OutboundBean.StreamSettingsBean(
