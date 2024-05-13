@@ -352,9 +352,18 @@ object Utils {
     }
 
     @Throws(IOException::class)
-    fun getUrlContentWithCustomUserAgent(urlStr: String?): String {
+    fun getUrlContentWithCustomUserAgent(urlStr: String?, httpPort: Int = 0): String {
         val url = URL(urlStr)
-        val conn = url.openConnection()
+        val conn = if (httpPort == 0) {
+            url.openConnection()
+        } else {
+            url.openConnection(
+                Proxy(
+                    Proxy.Type.HTTP,
+                    InetSocketAddress("127.0.0.1", httpPort)
+                )
+            )
+        }
         conn.setRequestProperty("Connection", "close")
         conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
         url.userInfo?.let {
@@ -425,5 +434,9 @@ object Utils {
     fun isTv(context: Context): Boolean =
         context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
 
+    fun getDelayTestUrl(): String {
+        val url = settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL)
+        return if (url.isNullOrEmpty()) AppConfig.DelayTestUrl else url
+    }
 }
 
