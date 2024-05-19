@@ -265,6 +265,8 @@ object AngConfigManager {
                             vnext.users[0].alterId = Utils.parseInt(vmessQRCode.aid)
                         }
 
+                        settingsStorage?.encode(AppConfig.PREF_MUX_CONCURRENCY, 16)
+                        settingsStorage?.encode(AppConfig.PREF_MUX_XUDP_CONCURRENCY, 8)
                         val vmuxAsBoolean = vmessQRCode?.mux.toBoolean()
                         settingsStorage?.encode(AppConfig.PREF_MUX_ENABLED, vmuxAsBoolean)
 
