@@ -206,8 +206,9 @@ object V2rayConfigUtil {
                 }
 
                 ERoutingMode.BYPASS_MAINLAND.value -> {
-                    routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
-                    routingGeo("domain", "geolocation-cn", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("ip", "ir", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("domain", "category-ir", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("domain", "category-ads-ir", AppConfig.TAG_BLOCKED, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
 

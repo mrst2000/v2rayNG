@@ -191,7 +191,6 @@ class SettingsActivity : BaseActivity() {
             muxConcurrency?.summary = settingsStorage.decodeString(AppConfig.PREF_MUX_CONCURRENCY, "8")
             muxXudpConcurrency?.summary = settingsStorage.decodeString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
 
-
             updateFragment(settingsStorage.getBoolean(AppConfig.PREF_FRAGMENT_ENABLED, true))
             fragment?.isChecked = settingsStorage.getBoolean(AppConfig.PREF_FRAGMENT_ENABLED, true)
             fragmentPackets?.summary = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_PACKETS, "tlshello")

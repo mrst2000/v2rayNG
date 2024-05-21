@@ -226,7 +226,7 @@ object AngConfigManager {
                 return 0
             }
 
-            settingsStorage?.encode(AppConfig.PREF_ROUTING_MODE, 0)
+            settingsStorage?.encode(AppConfig.PREF_ROUTING_MODE, 2)
             var config: ServerConfig? = null
             val allowInsecure = true
             if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
