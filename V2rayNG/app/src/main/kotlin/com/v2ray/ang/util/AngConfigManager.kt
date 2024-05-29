@@ -224,7 +224,7 @@ object AngConfigManager {
                 return 0
             }
 
-            settingsStorage?.encode(AppConfig.PREF_ROUTING_MODE, 2)
+            settingsStorage?.encode(AppConfig.PREF_ROUTING_MODE, "2")
             var config: ServerConfig? = null
             val allowInsecure = true
             if (str.startsWith(EConfigType.VMESS.protocolScheme)) {
@@ -265,8 +265,9 @@ object AngConfigManager {
 
                         settingsStorage?.encode(AppConfig.PREF_MUX_CONCURRENCY, 16)
                         settingsStorage?.encode(AppConfig.PREF_MUX_XUDP_CONCURRENCY, 8)
-                        val vmuxAsBoolean = vmessQRCode?.mux.toBoolean()
-                        settingsStorage?.encode(AppConfig.PREF_MUX_ENABLED, vmuxAsBoolean)
+
+                        val vdns = if (vmessQRCode.dns.isNullOrEmpty()) "8.8.8.8" else vmessQRCode.dns
+                        settingsStorage?.encode(AppConfig.PREF_REMOTE_DNS, vdns)
 
                         val frag = if (vmessQRCode.fragment.isNullOrEmpty()) "41,5,nofrag" else vmessQRCode.fragment
                         val fragpart = frag.split(",")
@@ -426,6 +427,15 @@ object AngConfigManager {
                     .associate { it.split("=").let { (k, v) -> k to Utils.urlDecode(v) } }
                 config = ServerConfig.create(EConfigType.VLESS)
                 val streamSetting = config.outboundBean?.streamSettings ?: return -1
+                val muxvalue = queryParam["mux"] ?: "16"
+                if (muxvalue.isNullOrEmpty()) {
+                    settingsStorage?.encode(AppConfig.PREF_MUX_ENABLED, false)
+                } else {
+                    val vmuxAsInt = muxvalue.toInt()
+                    settingsStorage?.encode(AppConfig.PREF_MUX_CONCURRENCY, vmuxAsInt)
+                    settingsStorage?.encode(AppConfig.PREF_MUX_ENABLED, true)
+
+                }
 
                 val vlessfrag = if (queryParam["fragment"].isNullOrEmpty()) "41,5,nofrag" else queryParam["fragment"]
 

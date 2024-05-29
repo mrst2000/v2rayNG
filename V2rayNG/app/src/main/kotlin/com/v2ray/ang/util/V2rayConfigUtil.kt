@@ -574,10 +574,13 @@ object V2rayConfigUtil {
 
     private fun updateOutboundFragment(v2rayConfig: V2rayConfig): Boolean {
         try {
-            if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == false) {
+            if (settingsStorage?.decodeBool(AppConfig.PREF_FRAGMENT_ENABLED, true) == false) {
                 return true
             }
             if (v2rayConfig.outbounds[0].streamSettings?.packet == "nofrag") {
+                return true
+            }
+            if (v2rayConfig.outbounds[0].streamSettings?.packet == "") {
                 return true
             }
 //            if (v2rayConfig.outbounds[0].streamSettings?.security != V2rayConfig.TLS
